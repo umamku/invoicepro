@@ -40,6 +40,15 @@ export interface InvoiceData {
   amountPaid: number;
 }
 
+export interface ReceiptData {
+  receiptNumber: string;
+  receivedFrom: string; // client name or custom string
+  amount: number;
+  amountInWords: string;
+  paymentFor: string;
+  locationAndDate: string;
+}
+
 interface AppContextType {
   settings: CompanySettings;
   setSettings: (settings: CompanySettings) => void;
@@ -49,6 +58,8 @@ interface AppContextType {
   deleteClient: (id: string) => void;
   invoiceData: InvoiceData;
   setInvoiceData: (data: InvoiceData) => void;
+  receiptData: ReceiptData;
+  setReceiptData: (data: ReceiptData) => void;
 }
 
 const defaultSettings: CompanySettings = {
@@ -72,6 +83,15 @@ const defaultInvoiceData: InvoiceData = {
   amountPaid: 0,
 };
 
+const defaultReceiptData: ReceiptData = {
+  receiptNumber: 'KWT-001',
+  receivedFrom: '',
+  amount: 0,
+  amountInWords: '',
+  paymentFor: '',
+  locationAndDate: `Jakarta, ${new Date().getDate()} ${new Date().toLocaleString('id-ID', { month: 'long' })} ${new Date().getFullYear()}`,
+};
+
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -88,6 +108,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [invoiceData, setInvoiceDataState] = useState<InvoiceData>(() => {
     const saved = localStorage.getItem('invoice_current');
     return saved ? JSON.parse(saved) : defaultInvoiceData;
+  });
+
+  const [receiptData, setReceiptDataState] = useState<ReceiptData>(() => {
+    const saved = localStorage.getItem('invoice_receipt_current');
+    return saved ? JSON.parse(saved) : defaultReceiptData;
   });
 
   const setSettings = (newSettings: CompanySettings) => {
@@ -122,6 +147,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     localStorage.setItem('invoice_current', JSON.stringify(data));
   };
 
+  const setReceiptData = (data: ReceiptData) => {
+    setReceiptDataState(data);
+    localStorage.setItem('invoice_receipt_current', JSON.stringify(data));
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -133,6 +163,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         deleteClient,
         invoiceData,
         setInvoiceData,
+        receiptData,
+        setReceiptData,
       }}
     >
       {children}
