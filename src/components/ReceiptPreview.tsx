@@ -72,7 +72,7 @@ const ReceiptPreview: React.FC = () => {
           <div style={{ display: 'flex', marginBottom: '10px' }}>
             <div style={{ width: '200px', fontWeight: 'bold', fontStyle: 'italic' }}>Uang sejumlah</div>
             <div style={{ flex: 1, backgroundColor: '#f3f4f6', padding: '0 10px', fontStyle: 'italic', display: 'flex', alignItems: 'center' }}>
-              : {receiptData.amountInWords ? `${receiptData.amountInWords} Rupiah` : ''}
+              : {receiptData.amountInWords ? receiptData.amountInWords : ''}
             </div>
           </div>
 
