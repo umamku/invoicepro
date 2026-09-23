@@ -1,12 +1,23 @@
 import React from 'react';
 import { useAppContext } from '../context/AppContext';
+import { formatTerbilang } from '../utils/terbilang';
 
 const ReceiptEditor: React.FC = () => {
   const { receiptData, setReceiptData, clients } = useAppContext();
 
   const handleReceiptChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setReceiptData({ ...receiptData, [name]: value });
+    
+    if (name === 'amount') {
+      const numValue = Number(value);
+      setReceiptData({ 
+        ...receiptData, 
+        [name]: numValue,
+        amountInWords: formatTerbilang(numValue)
+      });
+    } else {
+      setReceiptData({ ...receiptData, [name]: value });
+    }
   };
 
   const handleClientSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
