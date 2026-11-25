@@ -58,6 +58,12 @@ export interface InvoiceHistoryItem {
   balanceDue: number;
 }
 
+export interface ReceiptHistoryItem {
+  id: string;
+  printedAt: string;
+  receipt: ReceiptData;
+}
+
 interface AppContextType {
   settings: CompanySettings;
   setSettings: (settings: CompanySettings) => void;
@@ -73,6 +79,10 @@ interface AppContextType {
   addToInvoiceHistory: (invoice: InvoiceData, clientName?: string, totalAmount?: number, balanceDue?: number) => void;
   deleteInvoiceHistory: (id: string) => void;
   clearInvoiceHistory: () => void;
+  receiptHistory: ReceiptHistoryItem[];
+  addToReceiptHistory: (receipt: ReceiptData) => void;
+  deleteReceiptHistory: (id: string) => void;
+  clearReceiptHistory: () => void;
 }
 
 const defaultSettings: CompanySettings = {
@@ -130,6 +140,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const [invoiceHistory, setInvoiceHistoryState] = useState<InvoiceHistoryItem[]>(() => {
     const saved = localStorage.getItem('invoice_history');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [receiptHistory, setReceiptHistoryState] = useState<ReceiptHistoryItem[]>(() => {
+    const saved = localStorage.getItem('receipt_history');
     return saved ? JSON.parse(saved) : [];
   });
 
@@ -195,6 +210,28 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     localStorage.removeItem('invoice_history');
   };
 
+  const addToReceiptHistory = (receipt: ReceiptData) => {
+    const newItem: ReceiptHistoryItem = {
+      id: uuidv4(),
+      printedAt: new Date().toISOString(),
+      receipt: JSON.parse(JSON.stringify(receipt)),
+    };
+    const updated = [newItem, ...receiptHistory];
+    setReceiptHistoryState(updated);
+    localStorage.setItem('receipt_history', JSON.stringify(updated));
+  };
+
+  const deleteReceiptHistory = (id: string) => {
+    const updated = receiptHistory.filter(item => item.id !== id);
+    setReceiptHistoryState(updated);
+    localStorage.setItem('receipt_history', JSON.stringify(updated));
+  };
+
+  const clearReceiptHistory = () => {
+    setReceiptHistoryState([]);
+    localStorage.removeItem('receipt_history');
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -212,6 +249,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         addToInvoiceHistory,
         deleteInvoiceHistory,
         clearInvoiceHistory,
+        receiptHistory,
+        addToReceiptHistory,
+        deleteReceiptHistory,
+        clearReceiptHistory,
       }}
     >
       {children}

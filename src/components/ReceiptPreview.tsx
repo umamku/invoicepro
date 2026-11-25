@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { Printer } from 'lucide-react';
+import { Printer, CheckCircle } from 'lucide-react';
 
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('id-ID', {
@@ -11,9 +11,16 @@ const formatCurrency = (amount: number) => {
 };
 
 const ReceiptPreview: React.FC = () => {
-  const { settings, receiptData } = useAppContext();
+  const { settings, receiptData, addToReceiptHistory } = useAppContext();
+  const [savedNotice, setSavedNotice] = useState(false);
 
   const handlePrint = () => {
+    // 1. Catat ke riwayat kwitansi
+    addToReceiptHistory(receiptData);
+    setSavedNotice(true);
+    setTimeout(() => setSavedNotice(false), 3500);
+
+    // 2. Set document.title agar nama file PDF otomatis menjadi nomor kwitansi
     const originalTitle = document.title;
     const cleanReceiptNumber = (receiptData.receiptNumber || 'Kwitansi').trim().replace(/[/\\?%*:|"<>]/g, '-');
     document.title = cleanReceiptNumber;
@@ -25,8 +32,15 @@ const ReceiptPreview: React.FC = () => {
 
   return (
     <div>
-      <div className="flex justify-between align-center mb-4 no-print">
-        <h2>Kwitansi Preview</h2>
+      <div className="flex justify-between align-center mb-4 no-print flex-wrap gap-2">
+        <div>
+          <h2>Kwitansi Preview</h2>
+          {savedNotice && (
+            <div className="badge-saved-notice">
+              <CheckCircle size={14} /> Dokumen kwitansi berhasil dicatat di Riwayat
+            </div>
+          )}
+        </div>
         <button className="btn btn-primary" onClick={handlePrint}>
           <Printer size={18} /> Print / Save PDF
         </button>

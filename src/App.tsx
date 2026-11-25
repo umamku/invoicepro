@@ -7,6 +7,7 @@ import InvoicePreview from './components/InvoicePreview';
 import ReceiptEditor from './components/ReceiptEditor';
 import ReceiptPreview from './components/ReceiptPreview';
 import InvoiceHistory from './components/InvoiceHistory';
+import ReceiptHistory from './components/ReceiptHistory';
 import { 
   FileText, 
   Users, 
@@ -20,12 +21,12 @@ import {
   FileCheck2
 } from 'lucide-react';
 
-type TabType = 'editor' | 'preview' | 'history' | 'receipt-editor' | 'receipt-preview' | 'clients' | 'settings';
+type TabType = 'editor' | 'preview' | 'history' | 'receipt-editor' | 'receipt-preview' | 'receipt-history' | 'clients' | 'settings';
 
 const AppContent = () => {
   const [activeTab, setActiveTab] = useState<TabType>('editor');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { invoiceHistory } = useAppContext();
+  const { invoiceHistory, receiptHistory } = useAppContext();
 
   const handleNavClick = (tab: TabType) => {
     setActiveTab(tab);
@@ -44,6 +45,8 @@ const AppContent = () => {
         return <ReceiptEditor />;
       case 'receipt-preview':
         return <ReceiptPreview />;
+      case 'receipt-history':
+        return <ReceiptHistory onNavigate={handleNavClick} />;
       case 'clients':
         return <ClientList />;
       case 'settings':
@@ -66,6 +69,8 @@ const AppContent = () => {
         return 'Edit Kwitansi';
       case 'receipt-preview':
         return 'Preview Kwitansi';
+      case 'receipt-history':
+        return 'Riwayat Kwitansi';
       case 'clients':
         return 'Data Klien';
       case 'settings':
@@ -156,6 +161,16 @@ const AppContent = () => {
             <Eye size={18} /> 
             <span>Preview Kwitansi</span>
           </button>
+          <button 
+            className={`nav-link ${activeTab === 'receipt-history' ? 'active' : ''}`}
+            onClick={() => handleNavClick('receipt-history')}
+          >
+            <History size={18} /> 
+            <span style={{ flex: 1, textAlign: 'left' }}>Riwayat Kwitansi</span>
+            {receiptHistory.length > 0 && (
+              <span className="nav-badge nav-badge-emerald">{receiptHistory.length}</span>
+            )}
+          </button>
 
           <div className="nav-section-title">Master Data</div>
           <button 
@@ -192,19 +207,19 @@ const AppContent = () => {
           <span>Invoice</span>
         </button>
         <button 
-          className={`mobile-bottom-item ${activeTab === 'receipt-editor' || activeTab === 'receipt-preview' ? 'active' : ''}`}
+          className={`mobile-bottom-item ${activeTab === 'receipt-editor' || activeTab === 'receipt-preview' || activeTab === 'receipt-history' ? 'active' : ''}`}
           onClick={() => handleNavClick(activeTab === 'receipt-preview' ? 'receipt-preview' : 'receipt-editor')}
         >
           <FileCheck2 size={20} />
           <span>Kwitansi</span>
         </button>
         <button 
-          className={`mobile-bottom-item ${activeTab === 'history' ? 'active' : ''}`}
-          onClick={() => handleNavClick('history')}
+          className={`mobile-bottom-item ${activeTab === 'history' || activeTab === 'receipt-history' ? 'active' : ''}`}
+          onClick={() => handleNavClick(activeTab === 'receipt-history' ? 'receipt-history' : 'history')}
         >
           <div className="mobile-nav-icon-wrapper">
             <History size={20} />
-            {invoiceHistory.length > 0 && <span className="bottom-nav-dot" />}
+            {(invoiceHistory.length > 0 || receiptHistory.length > 0) && <span className="bottom-nav-dot" />}
           </div>
           <span>Riwayat</span>
         </button>
