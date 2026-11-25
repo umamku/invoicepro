@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { AppProvider, useAppContext } from './context/AppContext';
 import Settings from './components/Settings';
 import ClientList from './components/ClientList';
@@ -249,6 +250,7 @@ function App() {
   return (
     <AppProvider>
       <AppContent />
+      <Analytics />
     </AppProvider>
   );
 }
