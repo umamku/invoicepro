@@ -22,7 +22,9 @@ import {
   FileCheck2,
   Download,
   Smartphone,
-  Share2
+  Share2,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 
 type TabType = 'editor' | 'preview' | 'history' | 'receipt-editor' | 'receipt-preview' | 'receipt-history' | 'clients' | 'settings';
@@ -30,10 +32,21 @@ type TabType = 'editor' | 'preview' | 'history' | 'receipt-editor' | 'receipt-pr
 const AppContent = () => {
   const [activeTab, setActiveTab] = useState<TabType>('editor');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+    return localStorage.getItem('sidebar_collapsed') === 'true';
+  });
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isInstalled, setIsInstalled] = useState(false);
   const [showIosTip, setShowIosTip] = useState(false);
   const { invoiceHistory, receiptHistory } = useAppContext();
+
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed(prev => {
+      const next = !prev;
+      localStorage.setItem('sidebar_collapsed', String(next));
+      return next;
+    });
+  };
 
   useEffect(() => {
     // Check if running in standalone mode (already installed)
@@ -173,7 +186,7 @@ const AppContent = () => {
       )}
 
       {/* Main Sidebar (Desktop sidebar & Mobile Drawer) */}
-      <aside className={`sidebar no-print ${isMobileMenuOpen ? 'mobile-drawer-open' : ''}`}>
+      <aside className={`sidebar no-print ${isMobileMenuOpen ? 'mobile-drawer-open' : ''} ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
         <div className="sidebar-brand">
           <div className="brand-icon">
             <FileText size={18} />
@@ -182,6 +195,14 @@ const AppContent = () => {
             <span className="brand-title-name">Invoice</span>
             <span className="brand-title-badge">PRO</span>
           </div>
+          <button 
+            className="btn-sidebar-toggle"
+            onClick={toggleSidebar}
+            title="Sembunyikan Menu Navigasi"
+            aria-label="Sembunyikan Menu Navigasi"
+          >
+            <PanelLeftClose size={17} />
+          </button>
         </div>
 
         <nav className="sidebar-nav">
@@ -271,6 +292,18 @@ const AppContent = () => {
 
       {/* Main Content Area */}
       <main className="main-content">
+        {isSidebarCollapsed && (
+          <div className="top-expand-bar no-print">
+            <button 
+              className="btn-expand-sidebar"
+              onClick={toggleSidebar}
+              title="Tampilkan Menu Navigasi"
+            >
+              <PanelLeftOpen size={16} />
+              <span>Tampilkan Menu</span>
+            </button>
+          </div>
+        )}
         <div className="content-inner">
           {renderContent()}
         </div>
