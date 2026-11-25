@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Analytics } from '@vercel/analytics/react';
 import { AppProvider, useAppContext } from './context/AppContext';
 import Settings from './components/Settings';
@@ -19,7 +19,10 @@ import {
   Menu, 
   X,
   PlusCircle,
-  FileCheck2
+  FileCheck2,
+  Download,
+  Smartphone,
+  Share2
 } from 'lucide-react';
 
 type TabType = 'editor' | 'preview' | 'history' | 'receipt-editor' | 'receipt-preview' | 'receipt-history' | 'clients' | 'settings';
@@ -27,7 +30,57 @@ type TabType = 'editor' | 'preview' | 'history' | 'receipt-editor' | 'receipt-pr
 const AppContent = () => {
   const [activeTab, setActiveTab] = useState<TabType>('editor');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isInstalled, setIsInstalled] = useState(false);
+  const [showIosTip, setShowIosTip] = useState(false);
   const { invoiceHistory, receiptHistory } = useAppContext();
+
+  useEffect(() => {
+    // Check if running in standalone mode (already installed)
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
+    if (isStandalone) {
+      setIsInstalled(true);
+    }
+
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+
+    const handleAppInstalled = () => {
+      setIsInstalled(true);
+      setDeferredPrompt(null);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
+  }, []);
+
+  const isIosDevice = () => {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+  };
+
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const choiceResult = await deferredPrompt.userChoice;
+      if (choiceResult && choiceResult.outcome === 'accepted') {
+        setIsInstalled(true);
+      }
+      setDeferredPrompt(null);
+    } else if (isIosDevice()) {
+      setShowIosTip(true);
+    } else if (isInstalled) {
+      alert('Aplikasi InvoicePro sudah terinstal di perangkat Anda!');
+    } else {
+      alert('Untuk menginstal InvoicePro:\n1. Klik ikon "Install" di bilah alamat (address bar) browser Anda, atau\n2. Buka menu browser (titik tiga) lalu pilih "Install InvoicePro" / "Tambahkan ke Layar Utama".');
+    }
+  };
 
   const handleNavClick = (tab: TabType) => {
     setActiveTab(tab);
@@ -94,13 +147,21 @@ const AppContent = () => {
             <span className="brand-current-page">{getActiveTabTitle()}</span>
           </div>
         </div>
-        <button 
-          className="mobile-menu-toggle"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label="Toggle Menu"
-        >
-          {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        <div className="mobile-header-actions">
+          {!isInstalled && (
+            <button className="mobile-header-install-btn" onClick={handleInstallClick} title="Instal Aplikasi">
+              <Download size={14} />
+              <span>Instal</span>
+            </button>
+          )}
+          <button 
+            className="mobile-menu-toggle"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle Menu"
+          >
+            {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </header>
 
       {/* Backdrop for mobile drawer */}
@@ -192,6 +253,20 @@ const AppContent = () => {
             <span>Settings</span>
           </button>
         </nav>
+
+        <div className="sidebar-footer">
+          {!isInstalled ? (
+            <button className="btn-install-pwa" onClick={handleInstallClick} title="Instal InvoicePro di perangkat Anda">
+              <Download size={15} />
+              <span>Instal Aplikasi</span>
+            </button>
+          ) : (
+            <div className="sidebar-installed-badge">
+              <Smartphone size={14} />
+              <span>Aplikasi Terpasang</span>
+            </div>
+          )}
+        </div>
       </aside>
 
       {/* Main Content Area */}
@@ -242,6 +317,34 @@ const AppContent = () => {
           <span>Setting</span>
         </button>
       </nav>
+
+      {/* iOS Safari Installation Guide Modal */}
+      {showIosTip && (
+        <div className="modal-backdrop no-print" onClick={() => setShowIosTip(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="flex align-center gap-2">
+                <Smartphone className="text-primary" size={20} />
+                <h3>Instal di iPhone / iPad</h3>
+              </div>
+              <button className="modal-close-btn" onClick={() => setShowIosTip(false)}>×</button>
+            </div>
+            <div className="modal-body">
+              <p className="mb-4">Untuk memasang InvoicePro di layar utama iPhone/iPad Anda:</p>
+              <ol className="ios-steps-list">
+                <li>Ketuk tombol <strong>Share</strong> (ikon kotak dengan panah ke atas <Share2 size={15} style={{ display: 'inline', verticalAlign: 'middle', color: '#2563eb' }} />) di bilah bawah browser Safari.</li>
+                <li>Gulir ke bawah pada menu yang muncul, lalu pilih <strong>&quot;Add to Home Screen&quot;</strong> (<em>Tambah ke Layar Utama</em>).</li>
+                <li>Ketuk <strong>&quot;Add&quot;</strong> (<em>Tambah</em>) di pojok kanan atas layar.</li>
+              </ol>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-primary btn-sm" onClick={() => setShowIosTip(false)}>
+                Mengerti
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
