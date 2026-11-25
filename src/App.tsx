@@ -24,7 +24,8 @@ import {
   Smartphone,
   Share2,
   PanelLeftClose,
-  PanelLeftOpen
+  PanelLeftOpen,
+  ShieldCheck
 } from 'lucide-react';
 
 type TabType = 'editor' | 'preview' | 'history' | 'receipt-editor' | 'receipt-preview' | 'receipt-history' | 'clients' | 'settings';
@@ -38,7 +39,15 @@ const AppContent = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isInstalled, setIsInstalled] = useState(false);
   const [showIosTip, setShowIosTip] = useState(false);
+  const [showPrivacyNotice, setShowPrivacyNotice] = useState(() => {
+    return localStorage.getItem('privacy_notice_dismissed') !== 'true';
+  });
   const { invoiceHistory, receiptHistory } = useAppContext();
+
+  const dismissPrivacyNotice = () => {
+    setShowPrivacyNotice(false);
+    localStorage.setItem('privacy_notice_dismissed', 'true');
+  };
 
   const toggleSidebar = () => {
     setIsSidebarCollapsed(prev => {
@@ -292,6 +301,38 @@ const AppContent = () => {
 
       {/* Main Content Area */}
       <main className="main-content">
+        {showPrivacyNotice && (
+          <div className="privacy-notice-wrapper no-print">
+            <div className="privacy-notice-banner">
+              <div className="privacy-notice-icon-box">
+                <ShieldCheck size={20} className="text-primary" />
+              </div>
+              <div className="privacy-notice-content">
+                <div className="privacy-notice-title">
+                  100% Aman & Privat (Data Tersimpan di Browser Anda)
+                </div>
+                <div className="privacy-notice-desc">
+                  InvoicePro tidak menyimpan data Anda di server pihak ketiga. Seluruh profil usaha, kwitansi, invoice, dan data klien tersimpan aman di memori lokal browser ini. Disarankan untuk mengunduh <strong>Ekspor Cadangan (.json)</strong> di menu Setting agar data tidak hilang saat berganti perangkat atau membersihkan browser.
+                </div>
+              </div>
+              <div className="privacy-notice-actions">
+                <button 
+                  className="btn btn-outline btn-sm"
+                  onClick={() => handleNavClick('settings')}
+                >
+                  Buka Setting
+                </button>
+                <button 
+                  className="btn btn-primary btn-sm"
+                  onClick={dismissPrivacyNotice}
+                >
+                  Paham & Tutup ✕
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {isSidebarCollapsed && (
           <div className="top-expand-bar no-print">
             <button 

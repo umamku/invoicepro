@@ -12,7 +12,8 @@ import {
   FileUp,
   FileDown,
   Plus,
-  Trash2
+  Trash2,
+  ShieldCheck
 } from 'lucide-react';
 
 const Settings: React.FC = () => {
@@ -170,6 +171,26 @@ const Settings: React.FC = () => {
             <span style={{ backgroundColor: '#e2e8f0', padding: '0.1rem 0.5rem', borderRadius: '9999px', fontSize: '0.75rem', color: '#1e293b' }}>
               {receiptHistory.length}
             </span>
+          </div>
+        </div>
+
+        {/* Info Callout */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '0.65rem',
+          padding: '0.75rem 1rem',
+          backgroundColor: '#eff6ff',
+          borderRadius: 'var(--radius-md)',
+          border: '1px solid #bfdbfe',
+          marginBottom: '1.25rem',
+          fontSize: '0.825rem',
+          color: '#1e3a8a',
+          lineHeight: '1.5'
+        }}>
+          <ShieldCheck size={18} className="text-primary flex-shrink-0" style={{ marginTop: '2px' }} />
+          <div>
+            <strong>Privasi & Keamanan:</strong> Seluruh data disimpan langsung di browser perangkat ini (Client-Side). Hindari menggunakan mode <em>Incognito / Private Browsing</em> jika ingin data tersimpan permanen, dan unduh file cadangan (*Backup*) secara berkala.
           </div>
         </div>
 
