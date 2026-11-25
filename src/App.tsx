@@ -304,7 +304,7 @@ const AppContent = () => {
             </button>
           </div>
         )}
-        <div className="content-inner">
+        <div className={`content-inner ${isSidebarCollapsed ? 'full-width' : ''}`}>
           {renderContent()}
         </div>
       </main>
