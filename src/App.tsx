@@ -114,32 +114,35 @@ const AppContent = () => {
       <aside className={`sidebar no-print ${isMobileMenuOpen ? 'mobile-drawer-open' : ''}`}>
         <div className="sidebar-brand">
           <div className="brand-icon">
-            <FileText size={20} />
+            <FileText size={18} />
           </div>
-          <span>InvoicePro</span>
+          <div className="brand-title">
+            <span className="brand-title-name">Invoice</span>
+            <span className="brand-title-badge">PRO</span>
+          </div>
         </div>
 
         <nav className="sidebar-nav">
           <div className="nav-section-title">Invoice</div>
           <button 
-            className={`nav-link ${activeTab === 'editor' ? 'active' : ''}`}
+            className={`nav-link ${activeTab === 'editor' ? 'active active-invoice' : ''}`}
             onClick={() => handleNavClick('editor')}
           >
-            <FileText size={18} /> 
+            <FileText size={17} /> 
             <span>Edit Invoice</span>
           </button>
           <button 
-            className={`nav-link ${activeTab === 'preview' ? 'active' : ''}`}
+            className={`nav-link ${activeTab === 'preview' ? 'active active-invoice' : ''}`}
             onClick={() => handleNavClick('preview')}
           >
-            <Eye size={18} /> 
+            <Eye size={17} /> 
             <span>Preview Invoice</span>
           </button>
           <button 
-            className={`nav-link ${activeTab === 'history' ? 'active' : ''}`}
+            className={`nav-link ${activeTab === 'history' ? 'active active-invoice' : ''}`}
             onClick={() => handleNavClick('history')}
           >
-            <History size={18} /> 
+            <History size={17} /> 
             <span style={{ flex: 1, textAlign: 'left' }}>Riwayat Invoice</span>
             {invoiceHistory.length > 0 && (
               <span className="nav-badge">{invoiceHistory.length}</span>
@@ -148,24 +151,24 @@ const AppContent = () => {
 
           <div className="nav-section-title">Kwitansi</div>
           <button 
-            className={`nav-link ${activeTab === 'receipt-editor' ? 'active' : ''}`}
+            className={`nav-link ${activeTab === 'receipt-editor' ? 'active active-receipt' : ''}`}
             onClick={() => handleNavClick('receipt-editor')}
           >
-            <CheckSquare size={18} /> 
+            <CheckSquare size={17} /> 
             <span>Edit Kwitansi</span>
           </button>
           <button 
-            className={`nav-link ${activeTab === 'receipt-preview' ? 'active' : ''}`}
+            className={`nav-link ${activeTab === 'receipt-preview' ? 'active active-receipt' : ''}`}
             onClick={() => handleNavClick('receipt-preview')}
           >
-            <Eye size={18} /> 
+            <Eye size={17} /> 
             <span>Preview Kwitansi</span>
           </button>
           <button 
-            className={`nav-link ${activeTab === 'receipt-history' ? 'active' : ''}`}
+            className={`nav-link ${activeTab === 'receipt-history' ? 'active active-receipt' : ''}`}
             onClick={() => handleNavClick('receipt-history')}
           >
-            <History size={18} /> 
+            <History size={17} /> 
             <span style={{ flex: 1, textAlign: 'left' }}>Riwayat Kwitansi</span>
             {receiptHistory.length > 0 && (
               <span className="nav-badge nav-badge-emerald">{receiptHistory.length}</span>
@@ -174,17 +177,17 @@ const AppContent = () => {
 
           <div className="nav-section-title">Master Data</div>
           <button 
-            className={`nav-link ${activeTab === 'clients' ? 'active' : ''}`}
+            className={`nav-link ${activeTab === 'clients' ? 'active active-master' : ''}`}
             onClick={() => handleNavClick('clients')}
           >
-            <Users size={18} /> 
+            <Users size={17} /> 
             <span>Clients</span>
           </button>
           <button 
-            className={`nav-link ${activeTab === 'settings' ? 'active' : ''}`}
+            className={`nav-link ${activeTab === 'settings' ? 'active active-master' : ''}`}
             onClick={() => handleNavClick('settings')}
           >
-            <SettingsIcon size={18} /> 
+            <SettingsIcon size={17} /> 
             <span>Settings</span>
           </button>
         </nav>
