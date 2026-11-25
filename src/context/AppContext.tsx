@@ -112,28 +112,28 @@ interface AppContextType {
 }
 
 const defaultSettings: CompanySettings = {
-  name: 'Green Shop',
-  address: 'Mutiara Darussalam,\nDepok,\nJawa Barat, 16436\nIndonesia',
-  email: 'khoirulumam.ku@gmail.com',
-  phone: '081286692681',
+  name: 'PT Maju Bersama Sukses',
+  address: 'Jl. Jenderal Sudirman No. 123, Lantai 4\nJakarta Pusat, DKI Jakarta 10220\nIndonesia',
+  email: 'kontak@majubersamasukses.co.id',
+  phone: '0812-3456-7890',
   logo: '',
-  signatureName: 'Khoirul Umam',
+  signatureName: 'Budi Santoso, S.E.',
   signatureImage: '',
 };
 
 const defaultInvoiceData: InvoiceData = {
-  invoiceNumber: 'INV/2021/0024',
+  invoiceNumber: 'INV/2026/0001',
   date: new Date().toISOString().split('T')[0],
   dueDate: new Date().toISOString().split('T')[0],
   signatureDate: '',
   clientId: '',
-  items: [{ id: uuidv4(), name: 'Rumput sintetis', description: 'Tipe swiss premium 30mm', quantity: 100, price: 185000, discountPercent: 0, taxPercent: 0 }],
-  notes: 'Mohon Melakukan Pembayaran Ke Nomor Rekening: BNI #0361678463',
+  items: [{ id: uuidv4(), name: 'Jasa Konsultasi & Layanan Bisnis', description: 'Paket layanan profesional bulanan', quantity: 1, price: 1500000, discountPercent: 0, taxPercent: 0 }],
+  notes: 'Mohon melakukan pembayaran ke rekening:\nBank Central Asia (BCA): 123-456-7890\na.n. PT Maju Bersama Sukses',
   amountPaid: 0,
 };
 
 const defaultReceiptData: ReceiptData = {
-  receiptNumber: 'KWT-001',
+  receiptNumber: 'KWT-2026-0001',
   receivedFrom: '',
   amount: 0,
   amountInWords: '',
