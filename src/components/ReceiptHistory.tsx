@@ -1,18 +1,11 @@
 import React, { useState } from 'react';
 import { useAppContext, type ReceiptHistoryItem } from '../context/AppContext';
 import { History, Eye, Edit3, Trash2, Search, Calendar, CheckSquare, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { formatCurrency } from '../utils/currency';
 
 interface ReceiptHistoryProps {
   onNavigate: (tab: 'receipt-editor' | 'receipt-preview') => void;
 }
-
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'decimal',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(amount);
-};
 
 const formatDate = (isoString: string) => {
   if (!isoString) return '';

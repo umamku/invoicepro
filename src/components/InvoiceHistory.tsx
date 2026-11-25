@@ -1,18 +1,11 @@
 import React, { useState } from 'react';
 import { useAppContext, type InvoiceHistoryItem } from '../context/AppContext';
 import { History, Eye, Edit3, Trash2, Search, Calendar, FileText, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { formatCurrency } from '../utils/currency';
 
 interface InvoiceHistoryProps {
   onNavigate: (tab: 'editor' | 'preview') => void;
 }
-
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'decimal',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(amount);
-};
 
 const formatDate = (isoString: string) => {
   if (!isoString) return '';

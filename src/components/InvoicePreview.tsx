@@ -1,14 +1,7 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Printer, CheckCircle } from 'lucide-react';
-
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'decimal',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(amount);
-};
+import { formatCurrency } from '../utils/currency';
 
 const formatDateString = (dateStr: string) => {
   if (!dateStr) return '';

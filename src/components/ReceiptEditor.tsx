@@ -1,23 +1,24 @@
 import React from 'react';
 import { useAppContext } from '../context/AppContext';
 import { formatTerbilang } from '../utils/terbilang';
+import { formatNumberWithDots, parseNumberFromDots } from '../utils/currency';
+import { CheckSquare, User, Calendar, FileText } from 'lucide-react';
 
 const ReceiptEditor: React.FC = () => {
   const { receiptData, setReceiptData, clients } = useAppContext();
 
   const handleReceiptChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    
-    if (name === 'amount') {
-      const numValue = Number(value);
-      setReceiptData({ 
-        ...receiptData, 
-        [name]: numValue,
-        amountInWords: formatTerbilang(numValue)
-      });
-    } else {
-      setReceiptData({ ...receiptData, [name]: value });
-    }
+    setReceiptData({ ...receiptData, [name]: value });
+  };
+
+  const handleAmountChange = (rawStr: string) => {
+    const numValue = parseNumberFromDots(rawStr);
+    setReceiptData({ 
+      ...receiptData, 
+      amount: numValue,
+      amountInWords: formatTerbilang(numValue)
+    });
   };
 
   const handleClientSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -31,23 +32,37 @@ const ReceiptEditor: React.FC = () => {
 
   return (
     <div className="card">
-      <h2>Detail Kwitansi</h2>
+      <div className="flex align-center gap-2 mb-4">
+        <div className="section-icon bg-emerald-soft">
+          <CheckSquare size={20} className="text-emerald" />
+        </div>
+        <div>
+          <h2>Formulir Pembuatan Kwitansi</h2>
+          <p className="page-subtitle">Isi rincian penerimaan pembayaran. Nilai nominal dan teks terbilang otomatis terkonversi.</p>
+        </div>
+      </div>
       
       <div className="invoice-grid">
         <div className="form-group">
-          <label>Nomor Kwitansi</label>
+          <label className="flex align-center gap-2">
+            <FileText size={14} className="text-muted" />
+            <span>Nomor Kwitansi</span>
+          </label>
           <input
             type="text"
             name="receiptNumber"
             className="form-control"
             value={receiptData.receiptNumber}
             onChange={handleReceiptChange}
-            placeholder="KWT-001"
+            placeholder="Contoh: KWT-001"
           />
         </div>
         
         <div className="form-group">
-          <label>Pilih dari Klien (Opsional)</label>
+          <label className="flex align-center gap-2">
+            <User size={14} className="text-muted" />
+            <span>Pilih dari Daftar Klien (Opsional)</span>
+          </label>
           <select
             className="form-control"
             onChange={handleClientSelect}
@@ -62,63 +77,72 @@ const ReceiptEditor: React.FC = () => {
       </div>
 
       <div className="form-group">
-        <label>Telah terima dari</label>
+        <label className="flex align-center gap-2">
+          <User size={14} className="text-muted" />
+          <span>Telah Terima Dari</span>
+        </label>
         <input
           type="text"
           name="receivedFrom"
           className="form-control"
           value={receiptData.receivedFrom}
           onChange={handleReceiptChange}
-          placeholder="Nama orang atau perusahaan"
+          placeholder="Nama perorangan, instansi, atau perusahaan pembayar..."
         />
       </div>
 
       <div className="invoice-grid">
         <div className="form-group">
-          <label>Jumlah Uang (Rp)</label>
-          <input
-            type="number"
-            name="amount"
-            className="form-control"
-            value={receiptData.amount || ''}
-            onChange={handleReceiptChange}
-            min="0"
-          />
+          <label>Jumlah Nominal Uang (Rp)</label>
+          <div className="input-prefix-wrapper">
+            <span className="input-prefix">Rp</span>
+            <input
+              type="text"
+              name="amount"
+              className="form-control input-with-prefix text-right font-medium"
+              value={formatNumberWithDots(receiptData.amount)}
+              onChange={(e) => handleAmountChange(e.target.value)}
+              placeholder="0"
+            />
+          </div>
         </div>
         <div className="form-group">
-          <label>Terbilang (Manual)</label>
+          <label>Teks Terbilang (Otomatis)</label>
           <input
             type="text"
             name="amountInWords"
-            className="form-control"
+            className="form-control font-medium"
             value={receiptData.amountInWords}
             onChange={handleReceiptChange}
-            placeholder="Contoh: Satu Juta Rupiah"
+            placeholder="Terbilang otomatis terisi..."
           />
         </div>
       </div>
 
       <div className="form-group">
-        <label>Untuk pembayaran</label>
+        <label>Untuk Pembayaran</label>
         <textarea
           name="paymentFor"
           className="form-control"
           rows={3}
           value={receiptData.paymentFor}
           onChange={handleReceiptChange}
-          placeholder="Contoh: Pembayaran DP pembelian barang..."
+          placeholder="Contoh: Pembayaran lunas pelunasan tagihan invoice #INV-001..."
         />
       </div>
 
       <div className="form-group">
-        <label>Tempat & Tanggal (Tanda Tangan)</label>
+        <label className="flex align-center gap-2">
+          <Calendar size={14} className="text-muted" />
+          <span>Tempat & Tanggal Penerbitan (Tanda Tangan)</span>
+        </label>
         <input
           type="text"
           name="locationAndDate"
           className="form-control"
           value={receiptData.locationAndDate}
           onChange={handleReceiptChange}
-          placeholder="Contoh: Jakarta, 5 Agustus 2026"
+          placeholder="Contoh: Jakarta, 25 November 2026"
         />
       </div>
     </div>

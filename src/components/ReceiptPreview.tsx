@@ -1,14 +1,7 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Printer, CheckCircle } from 'lucide-react';
-
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'decimal',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(amount);
-};
+import { formatCurrency } from '../utils/currency';
 
 const ReceiptPreview: React.FC = () => {
   const { settings, receiptData, addToReceiptHistory } = useAppContext();
