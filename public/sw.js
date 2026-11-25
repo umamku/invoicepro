@@ -6,7 +6,8 @@ const STATIC_ASSETS = [
   '/favicon.svg',
   '/pwa-icon.svg',
   '/pwa-192.png',
-  '/pwa-512.png'
+  '/pwa-512.png',
+  '/og-image.png'
 ];
 
 // Install: Cache essential shell
