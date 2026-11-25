@@ -4,8 +4,10 @@ import { Printer, CheckCircle } from 'lucide-react';
 import { formatCurrency } from '../utils/currency';
 
 const ReceiptPreview: React.FC = () => {
-  const { settings, receiptData, addToReceiptHistory } = useAppContext();
+  const { settings, companies, receiptData, addToReceiptHistory } = useAppContext();
   const [savedNotice, setSavedNotice] = useState(false);
+
+  const company = (receiptData.companyId ? companies?.find(c => c.id === receiptData.companyId) : null) || settings;
 
   const handlePrint = () => {
     // 1. Catat ke riwayat kwitansi
@@ -54,15 +56,15 @@ const ReceiptPreview: React.FC = () => {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '3px double #333', paddingBottom: '15px', marginBottom: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            {settings.logo ? (
-              <img src={settings.logo} alt="Company Logo" style={{ maxWidth: '120px', maxHeight: '80px', objectFit: 'contain' }} />
+            {company.logo ? (
+              <img src={company.logo} alt="Company Logo" style={{ maxWidth: '120px', maxHeight: '80px', objectFit: 'contain' }} />
             ) : (
-              <h2 style={{ margin: 0, color: '#333' }}>{settings.name}</h2>
+              <h2 style={{ margin: 0, color: '#333' }}>{company.name}</h2>
             )}
             <div style={{ fontSize: '14px', color: '#555' }}>
-              {!settings.logo && <strong>{settings.name}</strong>}
-              <div style={{ whiteSpace: 'pre-wrap' }}>{settings.address}</div>
-              <div>{settings.phone}</div>
+              {!company.logo && <strong>{company.name}</strong>}
+              <div style={{ whiteSpace: 'pre-wrap' }}>{company.address}</div>
+              <div>{company.phone}</div>
             </div>
           </div>
           <div style={{ textAlign: 'right' }}>
@@ -117,15 +119,15 @@ const ReceiptPreview: React.FC = () => {
               {receiptData.locationAndDate}
             </div>
             <div style={{ height: '80px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              {settings.signatureImage ? (
-                <img src={settings.signatureImage} alt="Signature" style={{ maxHeight: '80px', objectFit: 'contain' }} />
+              {company.signatureImage ? (
+                <img src={company.signatureImage} alt="Signature" style={{ maxHeight: '80px', objectFit: 'contain' }} />
               ) : (
                 <span style={{ color: '#ccc', fontStyle: 'italic' }}>(Tanda Tangan)</span>
               )}
             </div>
             <div style={{ borderBottom: '1px solid #333', width: '80%', margin: '0 auto 5px auto' }}></div>
             <div style={{ fontWeight: 'bold' }}>
-              {settings.signatureName}
+              {company.signatureName}
             </div>
           </div>
         </div>

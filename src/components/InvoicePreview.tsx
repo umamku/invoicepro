@@ -24,9 +24,10 @@ const formatDateNumeric = (dateStr: string) => {
 
 
 const InvoicePreview: React.FC = () => {
-  const { settings, invoiceData, clients, addToInvoiceHistory } = useAppContext();
+  const { settings, companies, invoiceData, clients, addToInvoiceHistory } = useAppContext();
   const [savedNotice, setSavedNotice] = useState(false);
   
+  const company = (invoiceData.companyId ? companies?.find(c => c.id === invoiceData.companyId) : null) || settings;
   const client = clients.find(c => c.id === invoiceData.clientId);
   
   let subtotal = 0;
@@ -94,10 +95,10 @@ const InvoicePreview: React.FC = () => {
         {/* Header Section */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '40px' }}>
           <div>
-            {settings.logo ? (
-              <img src={settings.logo} alt="Company Logo" style={{ maxWidth: '200px', maxHeight: '100px', objectFit: 'contain' }} />
+            {company.logo ? (
+              <img src={company.logo} alt="Company Logo" style={{ maxWidth: '200px', maxHeight: '100px', objectFit: 'contain' }} />
             ) : (
-              <h1 style={{ color: '#4caf50', margin: 0, fontSize: '24px' }}>{settings.name}</h1>
+              <h1 style={{ color: '#4caf50', margin: 0, fontSize: '24px' }}>{company.name}</h1>
             )}
           </div>
           <div style={{ textAlign: 'right' }}>
@@ -127,10 +128,10 @@ const InvoicePreview: React.FC = () => {
             <h4 style={{ margin: '0 0 10px 0', fontSize: '14px', color: '#333' }}>Info Perusahaan</h4>
             <div style={{ borderBottom: '2px solid #ccc', marginBottom: '15px' }}></div>
             <div style={{ fontSize: '13px', color: '#555', lineHeight: '1.5' }}>
-              <strong style={{ color: '#000', display: 'block', marginBottom: '10px' }}>{settings.name}</strong>
-              <div style={{ whiteSpace: 'pre-wrap', marginBottom: '5px' }}>{settings.address}</div>
-              <div>Telp: {settings.phone}</div>
-              <div>Email: {settings.email}</div>
+              <strong style={{ color: '#000', display: 'block', marginBottom: '10px' }}>{company.name}</strong>
+              <div style={{ whiteSpace: 'pre-wrap', marginBottom: '5px' }}>{company.address}</div>
+              <div>Telp: {company.phone}</div>
+              <div>Email: {company.email}</div>
             </div>
           </div>
           <div style={{ flex: 1 }}>
@@ -216,13 +217,13 @@ const InvoicePreview: React.FC = () => {
             <div style={{ fontWeight: 600, fontSize: '14px', marginBottom: '20px' }}>
               {invoiceData.signatureDate ? invoiceData.signatureDate : formatDateString(invoiceData.date)}
             </div>
-            {settings.signatureImage ? (
-              <img src={settings.signatureImage} alt="Signature" style={{ height: '80px', objectFit: 'contain', marginBottom: '10px' }} />
+            {company.signatureImage ? (
+              <img src={company.signatureImage} alt="Signature" style={{ height: '80px', objectFit: 'contain', marginBottom: '10px' }} />
             ) : (
               <div style={{ height: '80px' }}></div> /* Placeholder space for signature */
             )}
-            <div style={{ fontWeight: 600, fontSize: '14px', borderTop: settings.signatureImage ? 'none' : '1px solid #ccc', paddingTop: settings.signatureImage ? '0' : '10px' }}>
-              {settings.signatureName}
+            <div style={{ fontWeight: 600, fontSize: '14px', borderTop: company.signatureImage ? 'none' : '1px solid #ccc', paddingTop: company.signatureImage ? '0' : '10px' }}>
+              {company.signatureName}
             </div>
           </div>
         </div>

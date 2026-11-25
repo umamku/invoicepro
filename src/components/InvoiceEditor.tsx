@@ -1,11 +1,11 @@
 import React from 'react';
 import { useAppContext } from '../context/AppContext';
-import { Plus, Trash2, FileText, Calendar, User, Clock, PenTool, CreditCard, Receipt } from 'lucide-react';
+import { Plus, Trash2, FileText, Calendar, User, Clock, PenTool, CreditCard, Receipt, Building2 } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { formatNumberWithDots, parseNumberFromDots, formatCurrency } from '../utils/currency';
 
 const InvoiceEditor: React.FC = () => {
-  const { invoiceData, setInvoiceData, clients } = useAppContext();
+  const { invoiceData, setInvoiceData, clients, companies, activeCompanyId, setActiveCompanyId } = useAppContext();
 
   const handleInvoiceChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -93,6 +93,27 @@ const InvoiceEditor: React.FC = () => {
         </div>
         
         <div className="invoice-grid">
+          <div className="form-group">
+            <label className="flex align-center gap-2">
+              <Building2 size={14} className="text-muted" />
+              <span>Profil Usaha (Penerbit)</span>
+            </label>
+            <select
+              name="companyId"
+              className="form-control"
+              value={invoiceData.companyId || activeCompanyId}
+              onChange={(e) => {
+                const selectedId = e.target.value;
+                setInvoiceData({ ...invoiceData, companyId: selectedId });
+                setActiveCompanyId(selectedId);
+              }}
+            >
+              {companies.map(c => (
+                <option key={c.id} value={c.id}>{c.name || 'Profil Tanpa Nama'}</option>
+              ))}
+            </select>
+          </div>
+
           <div className="form-group">
             <label className="flex align-center gap-2">
               <FileText size={14} className="text-muted" />

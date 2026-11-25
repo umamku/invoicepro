@@ -2,10 +2,10 @@ import React from 'react';
 import { useAppContext } from '../context/AppContext';
 import { formatTerbilang } from '../utils/terbilang';
 import { formatNumberWithDots, parseNumberFromDots } from '../utils/currency';
-import { CheckSquare, User, Calendar, FileText } from 'lucide-react';
+import { CheckSquare, User, Calendar, FileText, Building2 } from 'lucide-react';
 
 const ReceiptEditor: React.FC = () => {
-  const { receiptData, setReceiptData, clients } = useAppContext();
+  const { receiptData, setReceiptData, clients, companies, activeCompanyId, setActiveCompanyId } = useAppContext();
 
   const handleReceiptChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -43,6 +43,27 @@ const ReceiptEditor: React.FC = () => {
       </div>
       
       <div className="invoice-grid">
+        <div className="form-group">
+          <label className="flex align-center gap-2">
+            <Building2 size={14} className="text-muted" />
+            <span>Profil Usaha (Penerbit)</span>
+          </label>
+          <select
+            name="companyId"
+            className="form-control"
+            value={receiptData.companyId || activeCompanyId}
+            onChange={(e) => {
+              const selectedId = e.target.value;
+              setReceiptData({ ...receiptData, companyId: selectedId });
+              setActiveCompanyId(selectedId);
+            }}
+          >
+            {companies.map(c => (
+              <option key={c.id} value={c.id}>{c.name || 'Profil Tanpa Nama'}</option>
+            ))}
+          </select>
+        </div>
+
         <div className="form-group">
           <label className="flex align-center gap-2">
             <FileText size={14} className="text-muted" />

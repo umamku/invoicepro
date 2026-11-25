@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, type ReactNode } from 'reac
 import { v4 as uuidv4 } from 'uuid';
 
 export interface CompanySettings {
+  id?: string;
   name: string;
   address: string;
   email: string;
@@ -10,6 +11,8 @@ export interface CompanySettings {
   signatureName: string;
   signatureImage: string; // base64 string
 }
+
+export type CompanyProfile = CompanySettings & { id: string };
 
 export interface Client {
   id: string;
@@ -35,6 +38,7 @@ export interface InvoiceData {
   dueDate: string;
   signatureDate: string;
   clientId: string;
+  companyId?: string;
   items: InvoiceItem[];
   notes: string;
   amountPaid: number;
@@ -43,6 +47,7 @@ export interface InvoiceData {
 export interface ReceiptData {
   receiptNumber: string;
   receivedFrom: string; // client name or custom string
+  companyId?: string;
   amount: number;
   amountInWords: string;
   paymentFor: string;
@@ -68,6 +73,8 @@ export interface BackupData {
   version: string;
   exportedAt: string;
   settings: CompanySettings;
+  companies?: CompanyProfile[];
+  activeCompanyId?: string;
   clients: Client[];
   invoiceData: InvoiceData;
   receiptData: ReceiptData;
@@ -78,6 +85,12 @@ export interface BackupData {
 interface AppContextType {
   settings: CompanySettings;
   setSettings: (settings: CompanySettings) => void;
+  companies: CompanyProfile[];
+  activeCompanyId: string;
+  setActiveCompanyId: (id: string) => void;
+  addCompanyProfile: (profile?: Partial<CompanyProfile>) => CompanyProfile;
+  updateCompanyProfile: (profile: CompanyProfile) => void;
+  deleteCompanyProfile: (id: string) => void;
   clients: Client[];
   addClient: (client: Omit<Client, 'id'>) => void;
   updateClient: (client: Client) => void;
@@ -131,10 +144,103 @@ const defaultReceiptData: ReceiptData = {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [settings, setSettingsState] = useState<CompanySettings>(() => {
-    const saved = localStorage.getItem('invoice_settings');
-    return saved ? JSON.parse(saved) : defaultSettings;
+  const [companies, setCompaniesState] = useState<CompanyProfile[]>(() => {
+    const saved = localStorage.getItem('invoice_companies');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    const oldSettings = localStorage.getItem('invoice_settings');
+    const base = oldSettings ? JSON.parse(oldSettings) : defaultSettings;
+    return [{
+      ...base,
+      id: base.id || 'default-company-1',
+      name: base.name || 'Usaha Utama',
+    }];
   });
+
+  const [activeCompanyId, setActiveCompanyIdState] = useState<string>(() => {
+    return localStorage.getItem('invoice_active_company_id') || 'default-company-1';
+  });
+
+  const activeCompany: CompanyProfile = companies.find(c => c.id === activeCompanyId) || companies[0] || {
+    ...defaultSettings,
+    id: 'default-company-1',
+  };
+
+  const settings: CompanySettings = activeCompany;
+
+  const setActiveCompanyId = (id: string) => {
+    setActiveCompanyIdState(id);
+    localStorage.setItem('invoice_active_company_id', id);
+    const target = companies.find(c => c.id === id);
+    if (target) {
+      localStorage.setItem('invoice_settings', JSON.stringify(target));
+    }
+  };
+
+  const setSettings = (newSettings: CompanySettings) => {
+    const updatedCompany: CompanyProfile = {
+      ...newSettings,
+      id: activeCompany.id || 'default-company-1',
+    };
+    const updatedCompanies = companies.map(c => c.id === updatedCompany.id ? updatedCompany : c);
+    setCompaniesState(updatedCompanies);
+    localStorage.setItem('invoice_companies', JSON.stringify(updatedCompanies));
+    localStorage.setItem('invoice_settings', JSON.stringify(updatedCompany));
+  };
+
+  const addCompanyProfile = (profile?: Partial<CompanyProfile>): CompanyProfile => {
+    const newId = uuidv4();
+    const newProfile: CompanyProfile = {
+      id: newId,
+      name: profile?.name || `Profil Usaha ${companies.length + 1}`,
+      address: profile?.address || '',
+      email: profile?.email || '',
+      phone: profile?.phone || '',
+      logo: profile?.logo || '',
+      signatureName: profile?.signatureName || '',
+      signatureImage: profile?.signatureImage || '',
+    };
+    const updated = [...companies, newProfile];
+    setCompaniesState(updated);
+    setActiveCompanyIdState(newId);
+    localStorage.setItem('invoice_companies', JSON.stringify(updated));
+    localStorage.setItem('invoice_active_company_id', newId);
+    localStorage.setItem('invoice_settings', JSON.stringify(newProfile));
+    return newProfile;
+  };
+
+  const updateCompanyProfile = (profile: CompanyProfile) => {
+    const updated = companies.map(c => c.id === profile.id ? profile : c);
+    setCompaniesState(updated);
+    localStorage.setItem('invoice_companies', JSON.stringify(updated));
+    if (profile.id === activeCompany.id) {
+      localStorage.setItem('invoice_settings', JSON.stringify(profile));
+    }
+  };
+
+  const deleteCompanyProfile = (id: string) => {
+    if (companies.length <= 1) {
+      alert('Minimal harus ada 1 profil usaha.');
+      return;
+    }
+    const updated = companies.filter(c => c.id !== id);
+    setCompaniesState(updated);
+    localStorage.setItem('invoice_companies', JSON.stringify(updated));
+    if (activeCompanyId === id) {
+      const nextActiveId = updated[0].id;
+      setActiveCompanyIdState(nextActiveId);
+      localStorage.setItem('invoice_active_company_id', nextActiveId);
+      localStorage.setItem('invoice_settings', JSON.stringify(updated[0]));
+    }
+  };
 
   const [clients, setClientsState] = useState<Client[]>(() => {
     const saved = localStorage.getItem('invoice_clients');
@@ -160,11 +266,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const saved = localStorage.getItem('receipt_history');
     return saved ? JSON.parse(saved) : [];
   });
-
-  const setSettings = (newSettings: CompanySettings) => {
-    setSettingsState(newSettings);
-    localStorage.setItem('invoice_settings', JSON.stringify(newSettings));
-  };
 
   const addClient = (client: Omit<Client, 'id'>) => {
     const newClient = { ...client, id: uuidv4() };
@@ -247,9 +348,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const exportAllData = (): BackupData => {
     return {
-      version: '1.0',
+      version: '1.1',
       exportedAt: new Date().toISOString(),
-      settings,
+      settings: activeCompany,
+      companies,
+      activeCompanyId,
       clients,
       invoiceData,
       receiptData,
@@ -263,9 +366,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       if (!backup || typeof backup !== 'object') {
         throw new Error('Format file cadangan tidak valid');
       }
-      if (backup.settings && typeof backup.settings === 'object') {
-        setSettingsState(backup.settings);
-        localStorage.setItem('invoice_settings', JSON.stringify(backup.settings));
+      if (Array.isArray(backup.companies) && backup.companies.length > 0) {
+        setCompaniesState(backup.companies);
+        localStorage.setItem('invoice_companies', JSON.stringify(backup.companies));
+        const newActiveId = backup.activeCompanyId || backup.companies[0].id;
+        setActiveCompanyIdState(newActiveId);
+        localStorage.setItem('invoice_active_company_id', newActiveId);
+        const comp = backup.companies.find((c: any) => c.id === newActiveId) || backup.companies[0];
+        localStorage.setItem('invoice_settings', JSON.stringify(comp));
+      } else if (backup.settings && typeof backup.settings === 'object') {
+        const singleComp: CompanyProfile = {
+          ...backup.settings,
+          id: backup.settings.id || 'default-company-1',
+        };
+        setCompaniesState([singleComp]);
+        setActiveCompanyIdState(singleComp.id);
+        localStorage.setItem('invoice_companies', JSON.stringify([singleComp]));
+        localStorage.setItem('invoice_active_company_id', singleComp.id);
+        localStorage.setItem('invoice_settings', JSON.stringify(singleComp));
       }
       if (Array.isArray(backup.clients)) {
         setClientsState(backup.clients);
@@ -299,6 +417,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       value={{
         settings,
         setSettings,
+        companies,
+        activeCompanyId,
+        setActiveCompanyId,
+        addCompanyProfile,
+        updateCompanyProfile,
+        deleteCompanyProfile,
         clients,
         addClient,
         updateClient,

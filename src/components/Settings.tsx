@@ -10,13 +10,20 @@ import {
   CheckSquare,
   Building2,
   FileUp,
-  FileDown
+  FileDown,
+  Plus,
+  Trash2
 } from 'lucide-react';
 
 const Settings: React.FC = () => {
   const { 
     settings, 
     setSettings, 
+    companies,
+    activeCompanyId,
+    setActiveCompanyId,
+    addCompanyProfile,
+    deleteCompanyProfile,
     clients, 
     invoiceHistory, 
     receiptHistory, 
@@ -215,7 +222,69 @@ const Settings: React.FC = () => {
           </div>
           <div>
             <h2>Profil Usaha (Company Settings)</h2>
-            <p className="page-subtitle">Informasi identitas usaha, logo, dan tanda tangan resmi pada invoice & kwitansi.</p>
+            <p className="page-subtitle">Kelola satu atau beberapa profil usaha. Anda dapat memilih profil mana yang digunakan saat membuat invoice & kwitansi.</p>
+          </div>
+        </div>
+
+        {/* Profile Switcher / Management Bar */}
+        <div style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '0.85rem',
+          padding: '0.85rem 1rem',
+          backgroundColor: '#f8fafc',
+          borderRadius: 'var(--radius-md)',
+          border: '1px solid var(--border-color)',
+          marginBottom: '1.5rem',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flex: 1, minWidth: '240px' }}>
+            <Building2 size={18} className="text-primary" />
+            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+              Pilih Profil Usaha:
+            </span>
+            <select
+              className="form-control"
+              style={{ padding: '0.45rem 0.75rem', fontSize: '0.875rem', maxWidth: '300px' }}
+              value={activeCompanyId}
+              onChange={(e) => setActiveCompanyId(e.target.value)}
+            >
+              {companies.map(c => (
+                <option key={c.id} value={c.id}>{c.name || 'Profil Tanpa Nama'}</option>
+              ))}
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              className="btn btn-outline btn-sm"
+              onClick={() => {
+                const newP = addCompanyProfile();
+                showNotification('success', `Profil baru "${newP.name}" berhasil dibuat. Silakan sesuaikan datanya.`);
+              }}
+              title="Tambah profil usaha baru"
+            >
+              <Plus size={15} />
+              <span>Tambah Profil Baru</span>
+            </button>
+            {companies.length > 1 && (
+              <button
+                type="button"
+                className="btn btn-danger-soft btn-sm"
+                onClick={() => {
+                  if (confirm(`Yakin ingin menghapus profil "${settings.name}"?`)) {
+                    deleteCompanyProfile(activeCompanyId);
+                    showNotification('success', 'Profil usaha berhasil dihapus.');
+                  }
+                }}
+                title="Hapus profil usaha yang sedang aktif ini"
+              >
+                <Trash2 size={15} />
+                <span>Hapus Profil</span>
+              </button>
+            )}
           </div>
         </div>
 
