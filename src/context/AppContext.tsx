@@ -64,6 +64,17 @@ export interface ReceiptHistoryItem {
   receipt: ReceiptData;
 }
 
+export interface BackupData {
+  version: string;
+  exportedAt: string;
+  settings: CompanySettings;
+  clients: Client[];
+  invoiceData: InvoiceData;
+  receiptData: ReceiptData;
+  invoiceHistory: InvoiceHistoryItem[];
+  receiptHistory: ReceiptHistoryItem[];
+}
+
 interface AppContextType {
   settings: CompanySettings;
   setSettings: (settings: CompanySettings) => void;
@@ -83,6 +94,8 @@ interface AppContextType {
   addToReceiptHistory: (receipt: ReceiptData) => void;
   deleteReceiptHistory: (id: string) => void;
   clearReceiptHistory: () => void;
+  exportAllData: () => BackupData;
+  importAllData: (data: any) => boolean;
 }
 
 const defaultSettings: CompanySettings = {
@@ -232,6 +245,55 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     localStorage.removeItem('receipt_history');
   };
 
+  const exportAllData = (): BackupData => {
+    return {
+      version: '1.0',
+      exportedAt: new Date().toISOString(),
+      settings,
+      clients,
+      invoiceData,
+      receiptData,
+      invoiceHistory,
+      receiptHistory,
+    };
+  };
+
+  const importAllData = (backup: any): boolean => {
+    try {
+      if (!backup || typeof backup !== 'object') {
+        throw new Error('Format file cadangan tidak valid');
+      }
+      if (backup.settings && typeof backup.settings === 'object') {
+        setSettingsState(backup.settings);
+        localStorage.setItem('invoice_settings', JSON.stringify(backup.settings));
+      }
+      if (Array.isArray(backup.clients)) {
+        setClientsState(backup.clients);
+        localStorage.setItem('invoice_clients', JSON.stringify(backup.clients));
+      }
+      if (backup.invoiceData && typeof backup.invoiceData === 'object') {
+        setInvoiceDataState(backup.invoiceData);
+        localStorage.setItem('invoice_current', JSON.stringify(backup.invoiceData));
+      }
+      if (backup.receiptData && typeof backup.receiptData === 'object') {
+        setReceiptDataState(backup.receiptData);
+        localStorage.setItem('invoice_receipt_current', JSON.stringify(backup.receiptData));
+      }
+      if (Array.isArray(backup.invoiceHistory)) {
+        setInvoiceHistoryState(backup.invoiceHistory);
+        localStorage.setItem('invoice_history', JSON.stringify(backup.invoiceHistory));
+      }
+      if (Array.isArray(backup.receiptHistory)) {
+        setReceiptHistoryState(backup.receiptHistory);
+        localStorage.setItem('receipt_history', JSON.stringify(backup.receiptHistory));
+      }
+      return true;
+    } catch (err) {
+      console.error('Import error:', err);
+      return false;
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -253,6 +315,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         addToReceiptHistory,
         deleteReceiptHistory,
         clearReceiptHistory,
+        exportAllData,
+        importAllData,
       }}
     >
       {children}
