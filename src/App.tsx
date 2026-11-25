@@ -1,15 +1,36 @@
 import { useState } from 'react';
-import { AppProvider } from './context/AppContext';
+import { AppProvider, useAppContext } from './context/AppContext';
 import Settings from './components/Settings';
 import ClientList from './components/ClientList';
 import InvoiceEditor from './components/InvoiceEditor';
 import InvoicePreview from './components/InvoicePreview';
 import ReceiptEditor from './components/ReceiptEditor';
 import ReceiptPreview from './components/ReceiptPreview';
-import { FileText, Users, Settings as SettingsIcon, Eye, CheckSquare } from 'lucide-react';
+import InvoiceHistory from './components/InvoiceHistory';
+import { 
+  FileText, 
+  Users, 
+  Settings as SettingsIcon, 
+  Eye, 
+  CheckSquare, 
+  History, 
+  Menu, 
+  X,
+  PlusCircle,
+  FileCheck2
+} from 'lucide-react';
+
+type TabType = 'editor' | 'preview' | 'history' | 'receipt-editor' | 'receipt-preview' | 'clients' | 'settings';
 
 const AppContent = () => {
-  const [activeTab, setActiveTab] = useState<'editor' | 'preview' | 'receipt-editor' | 'receipt-preview' | 'clients' | 'settings'>('editor');
+  const [activeTab, setActiveTab] = useState<TabType>('editor');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { invoiceHistory } = useAppContext();
+
+  const handleNavClick = (tab: TabType) => {
+    setActiveTab(tab);
+    setIsMobileMenuOpen(false);
+  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -17,6 +38,8 @@ const AppContent = () => {
         return <InvoiceEditor />;
       case 'preview':
         return <InvoicePreview />;
+      case 'history':
+        return <InvoiceHistory onNavigate={handleNavClick} />;
       case 'receipt-editor':
         return <ReceiptEditor />;
       case 'receipt-preview':
@@ -30,62 +53,176 @@ const AppContent = () => {
     }
   };
 
+  // Determine current active section title for mobile header
+  const getActiveTabTitle = () => {
+    switch (activeTab) {
+      case 'editor':
+        return 'Edit Invoice';
+      case 'preview':
+        return 'Preview Invoice';
+      case 'history':
+        return 'Riwayat Invoice';
+      case 'receipt-editor':
+        return 'Edit Kwitansi';
+      case 'receipt-preview':
+        return 'Preview Kwitansi';
+      case 'clients':
+        return 'Data Klien';
+      case 'settings':
+        return 'Pengaturan';
+      default:
+        return 'InvoicePro';
+    }
+  };
+
   return (
     <div className="app-container">
-      <aside className="sidebar no-print">
-        <h1>
-          <div style={{ backgroundColor: 'var(--primary-color)', color: 'white', padding: '6px', borderRadius: '8px' }}>
+      {/* Mobile Top Header */}
+      <header className="mobile-header no-print">
+        <div className="mobile-header-brand">
+          <div className="brand-icon">
+            <FileText size={18} />
+          </div>
+          <div className="brand-text">
+            <span className="brand-name">InvoicePro</span>
+            <span className="brand-current-page">{getActiveTabTitle()}</span>
+          </div>
+        </div>
+        <button 
+          className="mobile-menu-toggle"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Toggle Menu"
+        >
+          {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
+      </header>
+
+      {/* Backdrop for mobile drawer */}
+      {isMobileMenuOpen && (
+        <div 
+          className="mobile-drawer-backdrop no-print"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Main Sidebar (Desktop sidebar & Mobile Drawer) */}
+      <aside className={`sidebar no-print ${isMobileMenuOpen ? 'mobile-drawer-open' : ''}`}>
+        <div className="sidebar-brand">
+          <div className="brand-icon">
             <FileText size={20} />
           </div>
-          InvoicePro
-        </h1>
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1 }}>
-          <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#64748b', marginTop: '10px', textTransform: 'uppercase' }}>Invoice</div>
+          <span>InvoicePro</span>
+        </div>
+
+        <nav className="sidebar-nav">
+          <div className="nav-section-title">Invoice</div>
           <button 
             className={`nav-link ${activeTab === 'editor' ? 'active' : ''}`}
-            onClick={() => setActiveTab('editor')}
+            onClick={() => handleNavClick('editor')}
           >
-            <FileText size={18} /> Edit Invoice
+            <FileText size={18} /> 
+            <span>Edit Invoice</span>
           </button>
           <button 
             className={`nav-link ${activeTab === 'preview' ? 'active' : ''}`}
-            onClick={() => setActiveTab('preview')}
+            onClick={() => handleNavClick('preview')}
           >
-            <Eye size={18} /> Preview Invoice
+            <Eye size={18} /> 
+            <span>Preview Invoice</span>
+          </button>
+          <button 
+            className={`nav-link ${activeTab === 'history' ? 'active' : ''}`}
+            onClick={() => handleNavClick('history')}
+          >
+            <History size={18} /> 
+            <span style={{ flex: 1, textAlign: 'left' }}>Riwayat Invoice</span>
+            {invoiceHistory.length > 0 && (
+              <span className="nav-badge">{invoiceHistory.length}</span>
+            )}
           </button>
 
-          <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#64748b', marginTop: '10px', textTransform: 'uppercase' }}>Kwitansi</div>
+          <div className="nav-section-title">Kwitansi</div>
           <button 
             className={`nav-link ${activeTab === 'receipt-editor' ? 'active' : ''}`}
-            onClick={() => setActiveTab('receipt-editor')}
+            onClick={() => handleNavClick('receipt-editor')}
           >
-            <CheckSquare size={18} /> Edit Kwitansi
+            <CheckSquare size={18} /> 
+            <span>Edit Kwitansi</span>
           </button>
           <button 
             className={`nav-link ${activeTab === 'receipt-preview' ? 'active' : ''}`}
-            onClick={() => setActiveTab('receipt-preview')}
+            onClick={() => handleNavClick('receipt-preview')}
           >
-            <Eye size={18} /> Preview Kwitansi
+            <Eye size={18} /> 
+            <span>Preview Kwitansi</span>
           </button>
 
-          <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#64748b', marginTop: '10px', textTransform: 'uppercase' }}>Master Data</div>
+          <div className="nav-section-title">Master Data</div>
           <button 
             className={`nav-link ${activeTab === 'clients' ? 'active' : ''}`}
-            onClick={() => setActiveTab('clients')}
+            onClick={() => handleNavClick('clients')}
           >
-            <Users size={18} /> Clients
+            <Users size={18} /> 
+            <span>Clients</span>
           </button>
           <button 
             className={`nav-link ${activeTab === 'settings' ? 'active' : ''}`}
-            onClick={() => setActiveTab('settings')}
+            onClick={() => handleNavClick('settings')}
           >
-            <SettingsIcon size={18} /> Settings
+            <SettingsIcon size={18} /> 
+            <span>Settings</span>
           </button>
         </nav>
       </aside>
+
+      {/* Main Content Area */}
       <main className="main-content">
-        {renderContent()}
+        <div className="content-inner">
+          {renderContent()}
+        </div>
       </main>
+
+      {/* Mobile Bottom Navigation Bar (App-like quick switch) */}
+      <nav className="mobile-bottom-nav no-print">
+        <button 
+          className={`mobile-bottom-item ${activeTab === 'editor' || activeTab === 'preview' ? 'active' : ''}`}
+          onClick={() => handleNavClick(activeTab === 'preview' ? 'preview' : 'editor')}
+        >
+          <PlusCircle size={20} />
+          <span>Invoice</span>
+        </button>
+        <button 
+          className={`mobile-bottom-item ${activeTab === 'receipt-editor' || activeTab === 'receipt-preview' ? 'active' : ''}`}
+          onClick={() => handleNavClick(activeTab === 'receipt-preview' ? 'receipt-preview' : 'receipt-editor')}
+        >
+          <FileCheck2 size={20} />
+          <span>Kwitansi</span>
+        </button>
+        <button 
+          className={`mobile-bottom-item ${activeTab === 'history' ? 'active' : ''}`}
+          onClick={() => handleNavClick('history')}
+        >
+          <div className="mobile-nav-icon-wrapper">
+            <History size={20} />
+            {invoiceHistory.length > 0 && <span className="bottom-nav-dot" />}
+          </div>
+          <span>Riwayat</span>
+        </button>
+        <button 
+          className={`mobile-bottom-item ${activeTab === 'clients' ? 'active' : ''}`}
+          onClick={() => handleNavClick('clients')}
+        >
+          <Users size={20} />
+          <span>Klien</span>
+        </button>
+        <button 
+          className={`mobile-bottom-item ${activeTab === 'settings' ? 'active' : ''}`}
+          onClick={() => handleNavClick('settings')}
+        >
+          <SettingsIcon size={20} />
+          <span>Setting</span>
+        </button>
+      </nav>
     </div>
   );
 };

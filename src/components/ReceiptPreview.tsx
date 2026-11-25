@@ -14,7 +14,13 @@ const ReceiptPreview: React.FC = () => {
   const { settings, receiptData } = useAppContext();
 
   const handlePrint = () => {
+    const originalTitle = document.title;
+    const cleanReceiptNumber = (receiptData.receiptNumber || 'Kwitansi').trim().replace(/[/\\?%*:|"<>]/g, '-');
+    document.title = cleanReceiptNumber;
     window.print();
+    setTimeout(() => {
+      document.title = originalTitle;
+    }, 1500);
   };
 
   return (

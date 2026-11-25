@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { Printer } from 'lucide-react';
+import { Printer, CheckCircle } from 'lucide-react';
 
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('en-US', {
@@ -31,7 +31,8 @@ const formatDateNumeric = (dateStr: string) => {
 
 
 const InvoicePreview: React.FC = () => {
-  const { settings, invoiceData, clients } = useAppContext();
+  const { settings, invoiceData, clients, addToInvoiceHistory } = useAppContext();
+  const [savedNotice, setSavedNotice] = useState(false);
   
   const client = clients.find(c => c.id === invoiceData.clientId);
   
@@ -61,13 +62,36 @@ const InvoicePreview: React.FC = () => {
   const balanceDue = total - (invoiceData.amountPaid || 0);
 
   const handlePrint = () => {
+    // 1. Simpan ke riwayat cetak/download
+    addToInvoiceHistory(invoiceData, client?.name, total, balanceDue);
+    setSavedNotice(true);
+    setTimeout(() => setSavedNotice(false), 3500);
+
+    // 2. Gunakan nomor invoice sebagai nama file default saat dialog cetak / Simpan PDF
+    const originalTitle = document.title;
+    const cleanInvoiceNumber = (invoiceData.invoiceNumber || 'Invoice').trim().replace(/[/\\?%*:|"<>]/g, '-');
+    document.title = cleanInvoiceNumber;
+
+    // 3. Panggil dialog cetak / Simpan PDF
     window.print();
+
+    // 4. Kembalikan judul dokumen setelah print dipanggil
+    setTimeout(() => {
+      document.title = originalTitle;
+    }, 1500);
   };
 
   return (
     <div>
-      <div className="flex justify-between align-center mb-4 no-print">
-        <h2>Invoice Preview</h2>
+      <div className="flex justify-between align-center mb-4 no-print flex-wrap gap-2">
+        <div>
+          <h2>Invoice Preview</h2>
+          {savedNotice && (
+            <div className="badge-saved-notice">
+              <CheckCircle size={14} /> Dokumen berhasil dicatat di Riwayat
+            </div>
+          )}
+        </div>
         <button className="btn btn-primary" onClick={handlePrint}>
           <Printer size={18} /> Print / Save PDF
         </button>
