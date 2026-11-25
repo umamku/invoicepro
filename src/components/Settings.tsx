@@ -147,18 +147,7 @@ const Settings: React.FC = () => {
         )}
 
         {/* Status Count Pills */}
-        <div 
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '1rem',
-            padding: '1rem',
-            backgroundColor: '#f8fafc',
-            borderRadius: 'var(--radius-md)',
-            border: '1px solid var(--border-color)',
-            marginBottom: '1.25rem',
-          }}
-        >
+        <div className="backup-status-grid">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
             <Users size={16} className="text-primary" />
             <span>Klien Tersimpan:</span>
@@ -185,7 +174,7 @@ const Settings: React.FC = () => {
         </div>
 
         {/* Action Buttons */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.85rem' }}>
+        <div className="backup-actions-grid">
           <button 
             type="button" 
             className="btn btn-primary"
@@ -227,26 +216,14 @@ const Settings: React.FC = () => {
         </div>
 
         {/* Profile Switcher / Management Bar */}
-        <div style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '0.85rem',
-          padding: '0.85rem 1rem',
-          backgroundColor: '#f8fafc',
-          borderRadius: 'var(--radius-md)',
-          border: '1px solid var(--border-color)',
-          marginBottom: '1.5rem',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flex: 1, minWidth: '240px' }}>
-            <Building2 size={18} className="text-primary" />
+        <div className="profile-switcher-bar">
+          <div className="profile-switcher-select-group">
+            <Building2 size={18} className="text-primary flex-shrink-0" />
             <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
               Pilih Profil Usaha:
             </span>
             <select
-              className="form-control"
-              style={{ padding: '0.45rem 0.75rem', fontSize: '0.875rem', maxWidth: '300px' }}
+              className="form-control profile-switcher-select"
               value={activeCompanyId}
               onChange={(e) => setActiveCompanyId(e.target.value)}
             >
@@ -256,7 +233,7 @@ const Settings: React.FC = () => {
             </select>
           </div>
 
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <div className="profile-switcher-actions">
             <button
               type="button"
               className="btn btn-outline btn-sm"

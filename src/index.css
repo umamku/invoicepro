@@ -604,6 +604,57 @@ h3 {
   color: var(--text-primary);
 }
 
+/* Settings: Backup & Profile Switcher components */
+.backup-status-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #f8fafc;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  margin-bottom: 1.25rem;
+}
+
+.backup-actions-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+.profile-switcher-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
+  background-color: #f8fafc;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  margin-bottom: 1.5rem;
+}
+
+.profile-switcher-select-group {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex: 1;
+  min-width: 240px;
+}
+
+.profile-switcher-select {
+  padding: 0.45rem 0.75rem;
+  font-size: 0.875rem;
+  max-width: 300px;
+}
+
+.profile-switcher-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .grand-total-row {
   padding-top: 0.65rem;
   border-top: 1px dashed var(--border-color);
@@ -1217,6 +1268,26 @@ h3 {
     gap: 1rem;
   }
 
+  /* Bottom Notes & Live Calculation: Stack vertically on mobile */
+  .invoice-bottom-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .summary-card {
+    padding: 1.25rem;
+  }
+
+  .summary-row {
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .summary-val {
+    text-align: right;
+    word-break: break-word;
+  }
+
   .stats-grid {
     grid-template-columns: 1fr;
     gap: 0.75rem;
@@ -1227,19 +1298,79 @@ h3 {
     border-radius: var(--radius-lg);
   }
 
+  /* Form control responsive sizing (16px prevents iOS browser zoom on focus) */
+  .form-control {
+    font-size: 16px;
+  }
+
+  textarea.form-control {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+
   /* Tables container on mobile */
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-md);
+    margin-bottom: 0.75rem;
+  }
+
   .table {
     display: table;
-    min-width: 500px;
+    min-width: 580px;
   }
 
   /* Invoice and Kwitansi Previews on Mobile */
   .invoice-preview-container,
   .receipt-preview-container {
-    padding: 20px 15px;
+    padding: 1.25rem 1rem;
     border-radius: var(--radius-md);
-    min-width: 100%;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
     margin-bottom: 2rem;
+  }
+
+  /* Settings Page on Mobile */
+  .backup-status-grid {
+    flex-direction: column !important;
+    gap: 0.65rem !important;
+  }
+
+  .backup-actions-grid .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .profile-switcher-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.85rem;
+  }
+
+  .profile-switcher-select-group {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.4rem;
+    min-width: 0;
+  }
+
+  .profile-switcher-select {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .profile-switcher-actions {
+    width: 100%;
+  }
+
+  .profile-switcher-actions .btn {
+    flex: 1;
+    justify-content: center;
   }
 
   /* Mobile Bottom Navigation Bar */
