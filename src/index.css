@@ -104,9 +104,13 @@ body {
 
 @media (min-width: 769px) {
   .sidebar.sidebar-collapsed {
-    margin-left: -var(--sidebar-width);
-    opacity: 0;
-    pointer-events: none;
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .btn-sidebar-toggle {
+    display: none;
   }
 }
 
@@ -323,14 +327,15 @@ body {
 }
 
 .content-inner.full-width {
-  max-width: 100%;
-  margin: 0;
-  padding: 1rem 2.25rem 3rem 2.25rem;
+  max-width: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 1rem 2rem 3rem 2rem !important;
 }
 
 /* Expand Sidebar Toggle Bar (when sidebar is hidden on desktop) */
 .top-expand-bar {
-  padding: 1.25rem 2.25rem 0.25rem 2.25rem;
+  padding: 1.25rem 2rem 0.25rem 2rem;
   display: flex;
   align-items: center;
 }

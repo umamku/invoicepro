@@ -1,4 +1,4 @@
-const CACHE_NAME = 'invoicepro-cache-v1';
+const CACHE_NAME = 'invoicepro-cache-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
