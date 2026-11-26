@@ -3,6 +3,7 @@ import { useAppContext } from '../context/AppContext';
 import { Plus, Trash2, FileText, Calendar, User, Clock, PenTool, CreditCard, Receipt, Building2 } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { formatNumberWithDots, parseNumberFromDots, formatCurrency } from '../utils/currency';
+import { trackEvent } from '../utils/analytics';
 
 const InvoiceEditor: React.FC = () => {
   const { invoiceData, setInvoiceData, clients, companies, activeCompanyId, setActiveCompanyId } = useAppContext();
@@ -33,6 +34,7 @@ const InvoiceEditor: React.FC = () => {
   };
 
   const addItem = () => {
+    trackEvent('invoice_item_added');
     const newItem = {
       id: uuidv4(),
       name: '',

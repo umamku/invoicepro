@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Analytics } from '@vercel/analytics/react';
+import { trackPageView, trackEvent } from './utils/analytics';
 import { AppProvider, useAppContext } from './context/AppContext';
 import Settings from './components/Settings';
 import ClientList from './components/ClientList';
@@ -43,6 +44,11 @@ const AppContent = () => {
     return localStorage.getItem('privacy_notice_dismissed') !== 'true';
   });
   const { invoiceHistory, receiptHistory } = useAppContext();
+
+  // Track page / tab navigation
+  useEffect(() => {
+    trackPageView(activeTab);
+  }, [activeTab]);
 
   const dismissPrivacyNotice = () => {
     setShowPrivacyNotice(false);
@@ -88,6 +94,7 @@ const AppContent = () => {
   };
 
   const handleInstallClick = async () => {
+    trackEvent('pwa_install_clicked');
     if (deferredPrompt) {
       deferredPrompt.prompt();
       const choiceResult = await deferredPrompt.userChoice;

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAppContext, type ReceiptHistoryItem } from '../context/AppContext';
 import { History, Eye, Edit3, Trash2, Search, Calendar, CheckSquare, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { formatCurrency } from '../utils/currency';
+import { trackEvent } from '../utils/analytics';
 
 interface ReceiptHistoryProps {
   onNavigate: (tab: 'receipt-editor' | 'receipt-preview') => void;
@@ -33,11 +34,13 @@ export const ReceiptHistory: React.FC<ReceiptHistoryProps> = ({ onNavigate }) =>
   });
 
   const handleLoadAndEdit = (item: ReceiptHistoryItem) => {
+    trackEvent('receipt_history_reloaded', { action: 'edit' });
     setReceiptData(item.receipt);
     onNavigate('receipt-editor');
   };
 
   const handleLoadAndPreview = (item: ReceiptHistoryItem) => {
+    trackEvent('receipt_history_reloaded', { action: 'preview' });
     setReceiptData(item.receipt);
     onNavigate('receipt-preview');
   };

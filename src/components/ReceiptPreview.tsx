@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Printer, CheckCircle } from 'lucide-react';
 import { formatCurrency } from '../utils/currency';
+import { trackEvent } from '../utils/analytics';
 
 const ReceiptPreview: React.FC = () => {
   const { settings, companies, receiptData, addToReceiptHistory } = useAppContext();
@@ -10,6 +11,11 @@ const ReceiptPreview: React.FC = () => {
   const company = (receiptData.companyId ? companies?.find(c => c.id === receiptData.companyId) : null) || settings;
 
   const handlePrint = () => {
+    // 0. Track analytics event
+    trackEvent('receipt_print_pdf', {
+      has_signature: Boolean(company.signatureName || company.signatureImage),
+    });
+
     // 1. Catat ke riwayat kwitansi
     addToReceiptHistory(receiptData);
     setSavedNotice(true);

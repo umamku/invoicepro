@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAppContext, type Client } from '../context/AppContext';
 import { Edit2, Trash2, Plus } from 'lucide-react';
+import { trackEvent } from '../utils/analytics';
 
 const ClientList: React.FC = () => {
   const { clients, addClient, updateClient, deleteClient } = useAppContext();
@@ -26,6 +27,7 @@ const ClientList: React.FC = () => {
       setEditingId(null);
     } else {
       addClient(formData);
+      trackEvent('client_added');
     }
     setFormData({ name: '', address: '', email: '', phone: '' });
   };

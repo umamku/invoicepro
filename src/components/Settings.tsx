@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useAppContext } from '../context/AppContext';
+import { trackEvent } from '../utils/analytics';
 import { 
   Upload, 
   Database, 
@@ -60,6 +61,7 @@ const Settings: React.FC = () => {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+      trackEvent('backup_exported');
       showNotification('success', 'File cadangan berhasil diunduh! Simpan file ini untuk memindahkan data kapan saja.');
     } catch (err) {
       console.error(err);
@@ -78,6 +80,7 @@ const Settings: React.FC = () => {
         const parsed = JSON.parse(content);
         const success = importAllData(parsed);
         if (success) {
+          trackEvent('backup_imported');
           showNotification('success', 'Data cadangan berhasil dipulihkan! Semua profil, data klien, dan riwayat telah diperbarui.');
         } else {
           showNotification('error', 'Format file tidak sesuai atau rusak.');
@@ -260,6 +263,7 @@ const Settings: React.FC = () => {
               className="btn btn-outline btn-sm"
               onClick={() => {
                 const newP = addCompanyProfile();
+                trackEvent('company_profile_created');
                 showNotification('success', `Profil baru "${newP.name}" berhasil dibuat. Silakan sesuaikan datanya.`);
               }}
               title="Tambah profil usaha baru"

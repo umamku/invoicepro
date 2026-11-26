@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAppContext, type InvoiceHistoryItem } from '../context/AppContext';
 import { History, Eye, Edit3, Trash2, Search, Calendar, FileText, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { formatCurrency } from '../utils/currency';
+import { trackEvent } from '../utils/analytics';
 
 interface InvoiceHistoryProps {
   onNavigate: (tab: 'editor' | 'preview') => void;
@@ -32,11 +33,13 @@ export const InvoiceHistory: React.FC<InvoiceHistoryProps> = ({ onNavigate }) =>
   });
 
   const handleLoadAndEdit = (item: InvoiceHistoryItem) => {
+    trackEvent('invoice_history_reloaded', { action: 'edit' });
     setInvoiceData(item.invoice);
     onNavigate('editor');
   };
 
   const handleLoadAndPreview = (item: InvoiceHistoryItem) => {
+    trackEvent('invoice_history_reloaded', { action: 'preview' });
     setInvoiceData(item.invoice);
     onNavigate('preview');
   };

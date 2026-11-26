@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Printer, CheckCircle } from 'lucide-react';
 import { formatCurrency } from '../utils/currency';
+import { trackEvent } from '../utils/analytics';
 
 const formatDateString = (dateStr: string) => {
   if (!dateStr) return '';
@@ -56,6 +57,13 @@ const InvoicePreview: React.FC = () => {
   const balanceDue = total - (invoiceData.amountPaid || 0);
 
   const handlePrint = () => {
+    // 0. Track analytics event
+    trackEvent('invoice_print_pdf', {
+      items_count: invoiceData.items.length,
+      has_client: Boolean(invoiceData.clientId),
+      has_signature: Boolean(company?.signatureName || company?.signatureImage),
+    });
+
     // 1. Simpan ke riwayat cetak/download
     addToInvoiceHistory(invoiceData, client?.name, total, balanceDue);
     setSavedNotice(true);
