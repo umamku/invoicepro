@@ -80,16 +80,30 @@ export const trackPageView = (pageName: string, path?: string) => {
     }
   }
 
-  // GA4
-  if (GA_MEASUREMENT_ID && typeof window.gtag === 'function') {
-    try {
-      window.gtag('event', 'page_view', {
-        page_title: pageName,
-        page_location: window.location.origin + currentPath,
-        page_path: currentPath,
-      });
-    } catch (e) {
-      console.error(e);
+  // Google Analytics & Google Tag Manager (GTM)
+  if (typeof window !== 'undefined') {
+    if (typeof window.gtag === 'function') {
+      try {
+        window.gtag('event', 'page_view', {
+          page_title: pageName,
+          page_location: window.location.origin + currentPath,
+          page_path: currentPath,
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    if (Array.isArray(window.dataLayer)) {
+      try {
+        window.dataLayer.push({
+          event: 'page_view',
+          page_title: pageName,
+          page_path: currentPath,
+        });
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 };
@@ -108,12 +122,25 @@ export const trackEvent = (eventName: string, properties: Record<string, any> = 
     }
   }
 
-  // GA4
-  if (GA_MEASUREMENT_ID && typeof window.gtag === 'function') {
-    try {
-      window.gtag('event', eventName, properties);
-    } catch (e) {
-      console.error(e);
+  // Google Analytics & Google Tag Manager (GTM)
+  if (typeof window !== 'undefined') {
+    if (typeof window.gtag === 'function') {
+      try {
+        window.gtag('event', eventName, properties);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    if (Array.isArray(window.dataLayer)) {
+      try {
+        window.dataLayer.push({
+          event: eventName,
+          ...properties,
+        });
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 };
