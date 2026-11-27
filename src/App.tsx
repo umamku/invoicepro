@@ -68,6 +68,7 @@ const AppContent = () => {
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
     if (isStandalone) {
       setIsInstalled(true);
+      trackEvent('pwa_app_opened', { mode: 'standalone' });
     }
 
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -78,6 +79,7 @@ const AppContent = () => {
     const handleAppInstalled = () => {
       setIsInstalled(true);
       setDeferredPrompt(null);
+      trackEvent('pwa_installed');
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);

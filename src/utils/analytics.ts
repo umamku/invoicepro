@@ -15,6 +15,19 @@ const POSTHOG_HOST = import.meta.env.VITE_POSTHOG_HOST || 'https://us.i.posthog.
 const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-T4LLFZ4GX';
 
 /**
+ * Check if the user is running the app as an installed PWA (Standalone mode)
+ * Works for both Android / Chrome and iOS Safari "Add to Home Screen"
+ */
+export const isStandalonePWA = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    (window.navigator as any).standalone === true ||
+    document.referrer.includes('android-app://')
+  );
+};
+
+/**
  * Initialize PostHog and Google Analytics 4 (GA4)
  * Only initializes if environment keys are provided.
  */
@@ -67,6 +80,7 @@ export const initAnalytics = () => {
  */
 export const trackPageView = (pageName: string, path?: string) => {
   const currentPath = path || `/${pageName}`;
+  const isPwa = isStandalonePWA();
 
   // PostHog
   if (POSTHOG_KEY) {
@@ -74,6 +88,7 @@ export const trackPageView = (pageName: string, path?: string) => {
       posthog.capture('$pageview', {
         $current_url: window.location.origin + currentPath,
         page_name: pageName,
+        is_pwa: isPwa,
       });
     } catch (e) {
       console.error(e);
@@ -88,6 +103,7 @@ export const trackPageView = (pageName: string, path?: string) => {
           page_title: pageName,
           page_location: window.location.origin + currentPath,
           page_path: currentPath,
+          is_pwa: isPwa,
         });
       } catch (e) {
         console.error(e);
@@ -100,6 +116,7 @@ export const trackPageView = (pageName: string, path?: string) => {
           event: 'page_view',
           page_title: pageName,
           page_path: currentPath,
+          is_pwa: isPwa,
         });
       } catch (e) {
         console.error(e);
@@ -113,10 +130,15 @@ export const trackPageView = (pageName: string, path?: string) => {
  * Strictly send non-sensitive operational telemetry only.
  */
 export const trackEvent = (eventName: string, properties: Record<string, any> = {}) => {
+  const enrichedProperties = {
+    ...properties,
+    is_pwa: isStandalonePWA(),
+  };
+
   // PostHog
   if (POSTHOG_KEY) {
     try {
-      posthog.capture(eventName, properties);
+      posthog.capture(eventName, enrichedProperties);
     } catch (e) {
       console.error(e);
     }
@@ -126,7 +148,7 @@ export const trackEvent = (eventName: string, properties: Record<string, any> = 
   if (typeof window !== 'undefined') {
     if (typeof window.gtag === 'function') {
       try {
-        window.gtag('event', eventName, properties);
+        window.gtag('event', eventName, enrichedProperties);
       } catch (e) {
         console.error(e);
       }
@@ -136,7 +158,7 @@ export const trackEvent = (eventName: string, properties: Record<string, any> = 
       try {
         window.dataLayer.push({
           event: eventName,
-          ...properties,
+          ...enrichedProperties,
         });
       } catch (e) {
         console.error(e);
